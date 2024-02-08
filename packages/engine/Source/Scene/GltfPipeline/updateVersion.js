@@ -1089,6 +1089,16 @@ function convertMaterialsCommonToPbr(gltf) {
 
     if (defined(materialsCommon)) {
       const technique = materialsCommon.technique;
+
+      const values = defined(materialsCommon.values)
+        ? materialsCommon.values
+        : {};
+
+      ambient = values.ambient;
+      diffuse = values.diffuse;
+      emission = values.emission;
+      const transparency = values.transparency;
+
       if (technique === "CONSTANT") {
         // Add the KHR_materials_unlit extension
         addExtensionsUsed(gltf, "KHR_materials_unlit");
@@ -1096,16 +1106,20 @@ function convertMaterialsCommonToPbr(gltf) {
           ? material.extensions
           : {};
         material.extensions["KHR_materials_unlit"] = {};
+
+        if (!defined(diffuse))
+        {
+          // diffuse shouldn't be used for CONSTANT technique, only emission/ambient
+          // therefore copy emission/ambient to diffuse so it will be used as baseColor
+          if(defined(emission)) {
+            diffuse = emission;
+            emission = undefined;
+          }else if (defined(emission)) {
+            diffuse = emission;
+            emission = undefined;
+          }
+        }
       }
-
-      const values = defined(materialsCommon.values)
-        ? materialsCommon.values
-        : {};
-
-      const ambient = values.ambient;
-      const diffuse = values.diffuse;
-      const emission = values.emission;
-      const transparency = values.transparency;
 
       // These actually exist on the extension object, not the values object despite what's shown in the spec
       const doubleSided = materialsCommon.doubleSided;
