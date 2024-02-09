@@ -1114,9 +1114,9 @@ function convertMaterialsCommonToPbr(gltf) {
           if(defined(emission)) {
             diffuse = emission;
             emission = undefined;
-          }else if (defined(emission)) {
-            diffuse = emission;
-            emission = undefined;
+          }else if (defined(ambient)) {
+            diffuse = ambient;
+            ambient = undefined;
           }
         }
       }
